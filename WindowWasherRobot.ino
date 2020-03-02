@@ -3,10 +3,10 @@
 #include "Kinematics.h"
 #include <Encoder.h>
 
-#define KP                    .011
-#define KI                    .001
+#define KP                    .1
+#define KI                    0
 #define KD                    0
-#define KF                    
+#define KF                    0.095
 
 // Encoder Pin Definitions
 #define ENC_TOP_R_A           20
@@ -44,6 +44,7 @@ long lastTime;
 void setup () 
 {
   Serial.begin(115200);  // Initialize the serial port
+  Serial.println("Setup start");
 
   // Setup velocity controllers
   pid_contruct(&top_r_control, KP, KI, KD, KF);
@@ -57,26 +58,32 @@ void setup ()
   timer1 = 0;
   timer2 = 1000;
   lastTime = millis();
+
+  Serial.println("Setup done");
 }
 
 void loop () 
 {
   if (timer1 <= 0) {
-    motor_set_velocity(top_r_motor, 0.02);
-    motor_set_velocity(top_l_motor, 0.02);
+    motor_set_velocity(&top_r_motor, 0.5);
+    //motor_set_velocity(top_l_motor, 0.02);
 
     timer1 = 2000;
   }
 
   if (timer2 <= 0){
-    motor_set_velocity(top_r_motor, -0.02);
-    motor_set_velocity(top_l_motor, -0.02);
+    motor_set_velocity(&top_r_motor, -0.5);
+    //motor_set_velocity(top_l_motor, -0.02);
 
     timer2 = 2000;
   }
 
-  motor_update_pid(top_l_motor);
-  motor_update_pid(top_r_motor);
+  //motor_update_pid(top_l_motor);
+  motor_update_pid(&top_r_motor);
+
+  char p[100];
+  sprintf(p, "Setpoint Vel: %.2f, Actual Vel: %.2f", top_r_motor.vel_cmd, motor_get_velocity(&top_r_motor));
+  Serial.println(p);
 
   long nowTime = millis();
   timer1 -= nowTime - lastTime;

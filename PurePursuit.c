@@ -1,5 +1,4 @@
 #include "PurePursuit.h"
-#include "Kinematics.h"
 
 static pure_pursuit_path_point_t pure_pursuit_traj[PUREPURSUIT_TRAJ_SIZE];
 
@@ -56,11 +55,11 @@ void pure_pursuit_find_lookahead(pure_pursuit_path_point_t *lp, pure_pursuit_t *
 }
 
 float pure_pursuit_distance(robot_pose_t *robot_pos, pure_pursuit_path_point_t *lp){
-    return powf(powf((lp.x - robot_pos.x), 2) + powf((lp.y - robot_pos.y), 2), 0.5);
+    return pow(pow((lp->x - robot_pos->x), 2) + pow((lp->y - robot_pos->y), 2), 0.5);
 }
 
-void pure_pursuit_segment_point(pure_pursuit_path_point_t *point, size_t segment, float pct){
-    size_t segi = segment % PUREPURSUIT_TRAJ_SIZE; // Loop trajectory for now
+void pure_pursuit_segment_point(pure_pursuit_path_point_t *point, unsigned int segment, float pct){
+    unsigned int segi = segment % PUREPURSUIT_TRAJ_SIZE; // Loop trajectory for now
 
     pure_pursuit_path_point_t start = pure_pursuit_traj[segi];
     pure_pursuit_path_point_t end = pure_pursuit_traj[(segi + 1) % PUREPURSUIT_TRAJ_SIZE];
