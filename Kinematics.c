@@ -4,8 +4,8 @@
 
 #define KINE_WINDOW_WIDTH   60
 #define KINE_WINDOW_HEIGHT  72
-#define KINE_ROBOT_WIDTH    12
-#define KINE_ROBOT_HEIGHT   12
+#define KINE_ROBOT_WIDTH    7,5
+#define KINE_ROBOT_HEIGHT   7.5
 #define KINE_MAX_CABLE_LEN  (powf(powf(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT,2) + powf(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH,2), 0.5))
 
 static const float kinematics_max_cable_len = KINE_MAX_CABLE_LEN;
