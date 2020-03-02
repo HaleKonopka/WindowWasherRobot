@@ -19,7 +19,7 @@ static const float kinematics_max_cable_len = KINE_MAX_CABLE_LEN;
  * Perform forward kinematics on supplied cable lengths to determine
  * the pose of the robot.
  */
-void kinematics_forward(robot_cables_t *cab, robot_pose_t *p){
+void kinematics_forward_position(robot_cables_t *cab, robot_pose_t *p){
     float mounts_offset_x = KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH;
     float robot_offset_y = 0; //TODO: Add support for angled robot
 
@@ -44,9 +44,15 @@ void kinematics_forward(robot_cables_t *cab, robot_pose_t *p){
  * Perform inverse kinematics on the supplied pose of the robot
  * to determine the needed cable lenghts to be at that posiiton.
  */
-void kinematics_reverse(robot_pose_t *p, robot_cables_t *c){
+void kinematics_reverse_position(robot_pose_t *p, robot_cables_t *c){
     c->top_left = powf(powf(p->x, 2) + powf(p->y, 2), 0.5);
     c->top_right = powf(powf(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - p->x, 2) + powf(p->y, 2), 0.5);
+}
+
+void kinematics_reverse_velocity(robot_pose_t *pos, robot_pose_t *vel, robot_cables_t *c){
+    c->top_left = powf(powf(pos->x, 2) + powf(pos->y, 2), -0.5) * (vel->x*pos->x + vel->y*pos->y);
+    c->top_right = powf(powf(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2) + powf(pos->y, 2), -0.5) * 
+        (vel->y*pos->y - (KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x)*vel->x);
 }
 
 bool kinematics_pose_valid(robot_pose_t *p){

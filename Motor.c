@@ -40,7 +40,7 @@ void motor_set_velocity(motor_t *m, float vel){
 /**
  * Get the current linear velocity of the motor spool
  * 
- * @return velocity in meters/sec
+ * @return velocity in inches/sec
  */
 float motor_get_velocity(motor_t *m){
     long timeMillis = millis();
