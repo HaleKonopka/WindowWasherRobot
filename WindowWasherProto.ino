@@ -36,6 +36,9 @@ pid_control_t top_l_control;
 
 // State Variables
 long timeout;
+int timer1;
+int timer2;
+long lastTime;
 
 void setup () 
 {
@@ -50,12 +53,34 @@ void setup ()
   motor_initialize(&top_l_motor, &leftEncoder, &top_l_control, MTR_TOP_L_EN, MTR_TOP_L_ENB, MTR_TOP_L_PWM1, MTR_TOP_L_PWM2, MTR_TOP_L_DIAG);
 
   timeout = millis();
+  timer1 = 0;
+  timer2 = 1000;
+  lastTime = millis();
 }
 
 void loop () 
 {
-  motor_set_velocity(top_r_motor, 0.02);
-  motor_set_velocity(top_l_motor, 0.02);
+  if (timer1 <= 0) {
+    motor_set_velocity(top_r_motor, 0.02);
+    motor_set_velocity(top_l_motor, 0.02);
 
-  delay(100);
+    timer1 = 2000;
+  }
+
+  if (timer2 <= 0){
+    motor_set_velocity(top_r_motor, -0.02);
+    motor_set_velocity(top_l_motor, -0.02);
+
+    timer2 = 2000;
+  }
+
+  motor_update_pid(top_l_motor);
+  motor_update_pid(top_r_motor);
+
+  long nowTime = millis();
+  timer1 -= nowTime - lastTime;
+  timer2 -= nowTime - lastTime;
+  lastTime = nowTime;
+
+  delay(10);
 }

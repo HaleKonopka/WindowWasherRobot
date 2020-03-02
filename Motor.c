@@ -25,6 +25,11 @@ void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_p
 
     motor_stop(m, true);
 
+    m->vel_index = 0;
+    for(size_t i = 0; i < MOTOR_SIZE_AVG_VEL; i++){
+        m->vel_avg[i] = 0;
+    }
+
     m->enc.write(0);
 }
 
@@ -32,7 +37,14 @@ void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_p
  * Set the velocity of a motor using the defined PID controller
  */
 void motor_set_velocity(motor_t *m, float vel){
-    float pid_cmd = pid_control_calculate(m->pid, vel, motor_get_velocity(m), millis());
+    m->vel_cmd = vel
+}
+
+/**
+ * Updates the pid command and sets the motor to it
+ */
+void motor_update_pid(motor_t *m){
+    float pid_cmd = pid_control_calculate(m->pid, m->vel_cmd, motor_get_velocity(m), millis());
 
     motor_run(pid_cmd);
 }
@@ -46,12 +58,24 @@ float motor_get_velocity(motor_t *m){
     long timeMillis = millis();
 
     long deltaTicks = m->enc.read() - m->lastCount;
-    float ret =  deltaTicks * 1000.0 / (timeMillis - m->lastTimeMillis);
+    float vel =  deltaTicks * 1000.0 / (timeMillis - m->lastTimeMillis);
 
-    ret = ret * DIST_PER_REV / ENCODER_TICKS_PER_REV;
+    vel *= DIST_PER_REV / ENCODER_TICKS_PER_REV;
+    m->vel_avg[m->vel_index] = vel;
+    m->vel_index = (m->vel_index + 1) % MOTOR_SIZE_AVG_VEL;
+
+    float ret;
+    for (size_t i = 0; i < MOTOR_SIZE_AVG_VEL; i++){
+        ret += m->vel_avg;
+    }
+    ret /= (float) MOTOR_SIZE_AVG_VEL;
 
     m->lastTimeMillis = timeMillis;
     return ret;
+}
+
+float motor_get_position(motor_t *m){
+    return m->enc.read() * DIST_PER_REV / ENCODER_TICKS_PER_REV;
 }
 
 /**
