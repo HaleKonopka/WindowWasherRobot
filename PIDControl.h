@@ -13,4 +13,6 @@ typedef struct {
 
 void pid_contruct(pid_control_t *pid, float p, float i, float d, float ff);
 float pid_control_calculate(pid_control_t *pid, float setpoint, float process, long time);
+void pid_control_reset(pid_control_t *pid);
+
 #endif

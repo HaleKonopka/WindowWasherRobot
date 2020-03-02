@@ -35,6 +35,8 @@ float pid_control_calculate(pid_control_t *pid, float setpoint, float process, l
     return pid->p * error + pid->i * pid->accum + pid->d * deltaError + pid->ff;
 }
 
-void pid_control_clear_integrator(pid_control_t *pid){
+void pid_control_reset(pid_control_t *pid){
     pid->accum = 0;
+    pid->lastTimeMillisec = 0;
+    pid->lastError = 0;
 }
