@@ -1,6 +1,6 @@
 #include "PIDControl.h"
 
-void pid_contruct(pid_control_t *pid, float p, float i, float d, float ff){
+void pid_control_contruct(pid_control_t *pid, float p, float i, float d, float ff){
     pid->p = p;
     pid->i = i;
     pid->d = d;
@@ -32,7 +32,7 @@ float pid_control_calculate(pid_control_t *pid, float setpoint, float process, l
     float accumError = error * deltaTime / 1000.0;
     pid->accum += accumError;
 
-    return pid->p * error + pid->i * pid->accum + pid->d * deltaError + pid->ff;
+    return pid->p * error + pid->i * pid->accum + pid->d * deltaError + pid->ff * setpoint;
 }
 
 void pid_control_reset(pid_control_t *pid){

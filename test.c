@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-int main(){
+int test(){
     robot_pose_t p;
     robot_cables_t c;
 

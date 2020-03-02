@@ -47,6 +47,10 @@ void motor_update_pid(motor_t *m){
     float pid_cmd = pid_control_calculate(m->pid, m->vel_cmd, motor_get_velocity(m), millis());
 
     motor_run(m, pid_cmd);
+
+    char p[100];
+    sprintf(p, "Motor cmd: %s", String(pid_cmd, 2).c_str());
+    Serial.println(p);
 }
 
 /**
@@ -55,12 +59,19 @@ void motor_update_pid(motor_t *m){
  * @return velocity in inches/sec
  */
 float motor_get_velocity(motor_t *m){
-    long timeMillis = millis();
+    unsigned long timeMillis = millis();
 
-    long deltaTicks = m->enc->read() - m->lastCount;
+    long thisCount = m->enc->read();
+    long deltaTicks = thisCount - m->lastCount;
+    long deltaTime = (timeMillis - m->lastTimeMillis);
+    if (deltaTime == 0){
+        return m->cur_vel;
+    }
+
     float vel =  deltaTicks * 1000.0 / (timeMillis - m->lastTimeMillis);
+    m->lastCount = thisCount;
 
-    vel *= DIST_PER_REV / ENCODER_TICKS_PER_REV;
+    vel = vel * DIST_PER_REV / ENCODER_TICKS_PER_REV;
     m->vel_avg[m->vel_index] = vel;
     m->vel_index = (m->vel_index + 1) % MOTOR_SIZE_AVG_VEL;
 
@@ -68,10 +79,13 @@ float motor_get_velocity(motor_t *m){
     for (size_t i = 0; i < MOTOR_SIZE_AVG_VEL; i++){
         ret += m->vel_avg[i];
     }
-    ret /= (float) MOTOR_SIZE_AVG_VEL;
+    ret = ret / (float) MOTOR_SIZE_AVG_VEL;
+
+    m->cur_vel = ret;
 
     m->lastTimeMillis = timeMillis;
-    return ret;
+
+    return m->cur_vel;
 }
 
 float motor_get_position(motor_t *m){
@@ -108,22 +122,22 @@ void motor_coast(motor_t *m){
  *            reverse and +1 is full power forward
  */
 void motor_run(motor_t *m, float pct){
-    if (pct > 1.0) pct = 1.0;
-    if (pct < -1.0) pct = -1.0;
-
     float value = pct * 255;
-
+    if (pct > 255.0) pct = 255;
+    if (pct < -255.0) pct = -255;
+    
     digitalWrite(m->en, HIGH);
     digitalWrite(m->enb, LOW);
 
     if (value > 0) {
         analogWrite(m->pwm_a, (uint8_t) value);
-        digitalWrite(m->pwm_b, LOW);
+        analogWrite(m->pwm_b, LOW);
+        //Serial.println(String((uint8_t) value).c_str());
     } else if (value < 0){
-        analogWrite(m->pwm_b, (uint8_t) value);
-        digitalWrite(m->pwm_a, LOW);
+        analogWrite(m->pwm_b, (uint8_t) -value);
+        analogWrite(m->pwm_a, LOW);
     } else {
-        digitalWrite(m->pwm_a, LOW);
-        digitalWrite(m->pwm_b, LOW);
+        analogWrite(m->pwm_a, LOW);
+        analogWrite(m->pwm_b, LOW);
     }
 }

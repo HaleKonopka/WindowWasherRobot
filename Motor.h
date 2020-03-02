@@ -14,12 +14,13 @@ typedef struct {
     uint8_t pwm_a;
     uint8_t pwm_b;
     uint8_t diag;
-    long lastTimeMillis;
+    unsigned long lastTimeMillis;
     long lastCount;
     Encoder *enc;
     float vel_avg[MOTOR_SIZE_AVG_VEL];
     size_t vel_index;
     float vel_cmd;
+    float cur_vel;
     pid_control_t *pid;
 } motor_t;
 

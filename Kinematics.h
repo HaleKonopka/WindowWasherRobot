@@ -1,6 +1,11 @@
 #ifndef KINEMATICS_H
 #define KINEMATICS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 typedef struct {
     float x;
     float y;
@@ -16,4 +21,7 @@ void kinematics_forward_position(robot_cables_t *c, robot_pose_t *p);
 void kinematics_reverse_position(robot_pose_t *p, robot_cables_t *c);
 void kinematics_reverse_velocity(robot_pose_t *pos, robot_pose_t *vel, robot_cables_t *c);
 
+#ifdef __cplusplus
+}
+#endif
 #endif
