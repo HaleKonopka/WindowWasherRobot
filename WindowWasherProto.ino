@@ -1,5 +1,6 @@
 #include "PIDControl.h"
 #include "Motor.h"
+#inlclude "Kinematics.h"
 
 #define KP                    .011
 #define KI                    .001

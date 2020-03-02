@@ -5,7 +5,7 @@
 #include "PIDControl.h"
 
 #define ENCODER_TICKS_PER_REV   64
-#define DIST_PER_REV            0.08    // 1 inch diameter spool
+#define DIST_PER_REV            3.14    // 1 inch diameter spool
 
 typedef struct {
     uint8_t enb;
