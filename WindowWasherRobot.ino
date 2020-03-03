@@ -3,8 +3,8 @@
 #include "Kinematics.h"
 #include <Encoder.h>
 
-#define KP                    .5
-#define KI                    0
+#define KP                    .2
+#define KI                    0.2
 #define KD                    0
 #define KF                    0.095
 
@@ -43,7 +43,7 @@ unsigned long lastTime;
 
 void setup () 
 {
-  Serial.begin(9600);  // Initialize the serial port
+  Serial.begin(115200);  // Initialize the serial port
   Serial.println("Setup start");
 
   // Setup velocity controllers
@@ -51,12 +51,12 @@ void setup ()
   pid_control_contruct(&top_l_control, KP, KI, KD, KF);
 
   // Setup motors
-  motor_initialize(&top_r_motor, &rightEncoder, &top_r_control, MTR_TOP_R_EN, MTR_TOP_R_ENB, MTR_TOP_R_PWM1, MTR_TOP_R_PWM2, MTR_TOP_R_DIAG);
-  motor_initialize(&top_l_motor, &leftEncoder, &top_l_control, MTR_TOP_L_EN, MTR_TOP_L_ENB, MTR_TOP_L_PWM1, MTR_TOP_L_PWM2, MTR_TOP_L_DIAG);
+  motor_initialize(&top_r_motor, &rightEncoder, &top_r_control, MTR_TOP_R_EN, MTR_TOP_R_ENB, MTR_TOP_R_PWM1, MTR_TOP_R_PWM2, MTR_TOP_R_DIAG, false, false);
+  motor_initialize(&top_l_motor, &leftEncoder, &top_l_control, MTR_TOP_L_EN, MTR_TOP_L_ENB, MTR_TOP_L_PWM1, MTR_TOP_L_PWM2, MTR_TOP_L_DIAG, false, false);
 
   timeout = millis();
   timer1 = 0;
-  timer2 = 1000;
+  timer2 = 2000;
   lastTime = millis();
 
   Serial.println("Setup done");
@@ -65,24 +65,26 @@ void setup ()
 void loop () 
 {
   if (timer1 <= 0) {
-    motor_set_velocity(&top_r_motor, 0.5);
-    //motor_set_velocity(top_l_motor, 0.02);
+    motor_set_velocity(&top_r_motor, 2);
+    motor_set_velocity(&top_l_motor, 2);
 
-    timer1 = 2000;
+    timer1 = 4000;
   }
 
   if (timer2 <= 0){
-    motor_set_velocity(&top_r_motor, -0.5);
-    //motor_set_velocity(top_l_motor, -0.02);
+    motor_set_velocity(&top_r_motor, -2);
+    motor_set_velocity(&top_l_motor, -2);
 
-    timer2 = 2000;
+    timer2 = 4000;
   }
 
-  //motor_update_pid(top_l_motor);
+  motor_update_pid(&top_l_motor);
   motor_update_pid(&top_r_motor);
 
   char p[100];
-  sprintf(p, "Setpoint Vel: %s, Actual Vel: %s", String(top_r_motor.vel_cmd, 2).c_str(), String(motor_get_velocity(&top_r_motor), 2).c_str());
+  sprintf(p, "L Setpoint Vel: %s, Actual Vel: %s", String(top_r_motor.vel_cmd, 2).c_str(), String(motor_get_velocity(&top_r_motor), 2).c_str());
+  Serial.println(p);
+  sprintf(p, "R Setpoint Vel: %s, Actual Vel: %s", String(top_l_motor.vel_cmd, 2).c_str(), String(motor_get_velocity(&top_l_motor), 2).c_str());
   Serial.println(p);
 
   unsigned long nowTime = millis();
@@ -90,5 +92,5 @@ void loop ()
   timer2 -= nowTime - lastTime;
   lastTime = nowTime;
 
-  delay(10);
+  delay(5);
 }
