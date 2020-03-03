@@ -32,8 +32,12 @@ void kinematics_forward_position(robot_cables_t *cab, robot_pose_t *p){
     float b = (-2 * lambda * phi);
     float c = (pow(lambda, 2) - pow(cab->top_left, 2));
 
+    //printf("%.2f, %.2f, %.2f, %.2f\n", a, b, c, lambda);
+
     float y_pos = -b + pow(pow(b, 2) - 4*a*c, 0.5) / (2*a);
-    float x_pos = pow(pow(cab->top_left,2) - pow(y_pos,2),0.5);
+
+    float x_pos = 0;
+    if (cab->top_left > y_pos) x_pos = pow(pow(cab->top_left,2) - pow(y_pos,2),0.5);
 
     p->x = x_pos;
     p->y = y_pos;

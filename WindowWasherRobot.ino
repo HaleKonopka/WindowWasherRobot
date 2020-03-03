@@ -1,6 +1,7 @@
 #include "PIDControl.h"
 #include "Motor.h"
 #include "Kinematics.h"
+#include "PurePursuit.h"
 #include <Encoder.h>
 
 #define KP                    .2
@@ -35,11 +36,14 @@ motor_t top_l_motor;
 pid_control_t top_r_control;
 pid_control_t top_l_control;
 
-// State Variables
-long timeout;
-int timer1;
-int timer2;
-unsigned long lastTime;
+//Path following
+robot_pose_t startingLocation;
+pure_pursuit_t follower;
+robot_cables_t cableLens;
+robot_cables_t cableLenInitial;
+robot_cables_t cableVels;
+
+int iter = 0;
 
 void setup () 
 {
@@ -54,43 +58,40 @@ void setup ()
   motor_initialize(&top_r_motor, &rightEncoder, &top_r_control, MTR_TOP_R_EN, MTR_TOP_R_ENB, MTR_TOP_R_PWM1, MTR_TOP_R_PWM2, MTR_TOP_R_DIAG, false, false);
   motor_initialize(&top_l_motor, &leftEncoder, &top_l_control, MTR_TOP_L_EN, MTR_TOP_L_ENB, MTR_TOP_L_PWM1, MTR_TOP_L_PWM2, MTR_TOP_L_DIAG, false, false);
 
-  timeout = millis();
-  timer1 = 0;
-  timer2 = 2000;
-  lastTime = millis();
+  // Setup path follower
+  startingLocation.x = 7.0;
+  startingLocation.y = 39.0;
+  pure_pursuit_initialize(&follower, &startingLocation, 1, 3);
+  kinematics_reverse_position(&startingLocation, &cableLenInitial);
 
   Serial.println("Setup done");
 }
 
 void loop () 
 {
-  if (timer1 <= 0) {
-    motor_set_velocity(&top_r_motor, 2);
-    motor_set_velocity(&top_l_motor, 2);
+  cableLens.top_left = motor_get_position(&top_l_motor);
+  cableLens.top_right = motor_get_position(&top_r_motor);
+  cableLens.top_left += cableLenInitial.top_left;
+  cableLens.top_right += cableLenInitial.top_right;
+  
+  pure_pursuit_calculate(&follower, &cableLens, &cableVels);
 
-    timer1 = 4000;
-  }
-
-  if (timer2 <= 0){
-    motor_set_velocity(&top_r_motor, -2);
-    motor_set_velocity(&top_l_motor, -2);
-
-    timer2 = 4000;
-  }
+  motor_set_velocity(&top_l_motor, cableVels.top_left);
+  motor_set_velocity(&top_r_motor, cableVels.top_right);
 
   motor_update_pid(&top_l_motor);
   motor_update_pid(&top_r_motor);
 
-  char p[100];
-  sprintf(p, "L Setpoint Vel: %s, Actual Vel: %s", String(top_r_motor.vel_cmd, 2).c_str(), String(motor_get_velocity(&top_r_motor), 2).c_str());
-  Serial.println(p);
-  sprintf(p, "R Setpoint Vel: %s, Actual Vel: %s", String(top_l_motor.vel_cmd, 2).c_str(), String(motor_get_velocity(&top_l_motor), 2).c_str());
-  Serial.println(p);
+  if (iter > 20){
+    char p[100];
+    sprintf(p, "L Cable Len: %s, Cable Vel: %s", String(cableLens.top_left, 2).c_str(), String(cableVels.top_left, 2).c_str());
+    Serial.println(p);
+    sprintf(p, "R Cable Len: %s, Cable Vel: %s", String(cableLens.top_right, 2).c_str(), String(cableVels.top_right, 2).c_str());
+    Serial.println(p);
 
-  unsigned long nowTime = millis();
-  timer1 -= nowTime - lastTime;
-  timer2 -= nowTime - lastTime;
-  lastTime = nowTime;
+    iter = 0;
+  }
+  iter++;
 
   delay(5);
 }

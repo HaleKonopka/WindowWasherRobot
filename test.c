@@ -3,7 +3,9 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-int test(){
+int mymain(){
+    printf("Hello!\n");
+
     robot_pose_t p;
     robot_cables_t c;
 
@@ -15,12 +17,12 @@ int test(){
 
     p.x = 24;
     p.y = 10;
-    c.top_left = 103.81;
-    c.top_right = 103.81;
+    c.top_left = 30.52;
+    c.top_right = 83.05;
     kinematics_forward_position(&c, &p);
     printf("Forward: Pose (%.2f, %.2f) Cables (%.2f, %.2f)\n", p.x, p.y, c.top_left, c.top_right);
 
-    float ep = 0.1;
+    /*float ep = 0.1;
     for (float x = 0; x < 48; x += 0.25){
         for (float y = 0; y < 60; y += 0.25){
             p.x = x;
@@ -32,7 +34,7 @@ int test(){
             }
             //printf("Original Pose (%.2f, %.2f) Double Pose (%.5f, %.5f) Cables (%.2f, %.2f)\n", x, y, p.x, p.y, c.top_left, c.top_right);
         }
-    }
+    }*/
 
     robot_pose_t pvel;
     robot_cables_t cvel;
@@ -44,4 +46,6 @@ int test(){
     kinematics_reverse_velocity(&p, &pvel, &cvel);
     printf("Revese: Pose Pos (%.2f, %.2f) Pose Vel (%.2f, %.2f) Cables Pos (%.2f, %.2f) Cables Vel (%.2f, %.2f)\n",
         p.x, p.y, pvel.x, pvel.y, c.top_left, c.top_right, cvel.top_left, cvel.top_right);
+
+    return 0;
 }

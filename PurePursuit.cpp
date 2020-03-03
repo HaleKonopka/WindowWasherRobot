@@ -1,31 +1,41 @@
 #include "PurePursuit.h"
+#include <math.h>
 
 static pure_pursuit_path_point_t pure_pursuit_traj[PUREPURSUIT_TRAJ_SIZE];
 
-void pure_pursuit_initialize(pure_pursuit_t *c, float lookahead, float speed){
+void pure_pursuit_initialize(pure_pursuit_t *c, robot_pose_t *start, float lookahead, float speed){
     c->lookahead = lookahead;
     c->speed = speed;
     c->lastLpSeg = 0;
     c->lastLpSegPct = 0;
+    c->startingPos = start;
+
+    pure_pursuit_init_trajectory();
 }
 
 void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[0].x = 0;
     pure_pursuit_traj[0].y = 0;
     pure_pursuit_traj[1].x = 0;
-    pure_pursuit_traj[1].y = 12;
-    pure_pursuit_traj[2].x = 12;
-    pure_pursuit_traj[2].y = 12;
-    pure_pursuit_traj[3].x = 12;
+    pure_pursuit_traj[1].y = 8;
+    pure_pursuit_traj[2].x = 36;
+    pure_pursuit_traj[2].y = 8;
+    pure_pursuit_traj[3].x = 36;
     pure_pursuit_traj[3].y = 0;
 }
 
 void pure_pursuit_calculate(pure_pursuit_t *c, robot_cables_t *cables_pos, robot_cables_t *cables_vel){
     robot_pose_t robot_pos;
-    kinematics_forward_position(&cables_pos, &robot_pos);
+    char p[100];
+    sprintf(p, "Cable pose: (%s, %s)", String(cables_pos->top_left, 2).c_str(), String(cables_pos->top_right, 2).c_str());
+    Serial.println(p);
+    kinematics_forward_position(cables_pos, &robot_pos);
+
+    sprintf(p, "Robot pose: (%s, %s)", String(robot_pos.x, 2).c_str(), String(robot_pos.y, 2).c_str());
+    Serial.println(p);
 
     pure_pursuit_path_point_t lp;
-    pure_pursuit_find_lookahead(lp, c, robot_pos);
+    pure_pursuit_find_lookahead(&lp, c, &robot_pos);
 
     float dx = lp.x - robot_pos.x;
     float dy = lp.y - robot_pos.y;
@@ -39,7 +49,7 @@ void pure_pursuit_calculate(pure_pursuit_t *c, robot_cables_t *cables_pos, robot
 }
 
 void pure_pursuit_find_lookahead(pure_pursuit_path_point_t *lp, pure_pursuit_t *c, robot_pose_t *robot_pos){
-    pure_pursuit_segment_point(lp, c->lastLpSeg, c->lastLpSegPct);
+    pure_pursuit_segment_point(lp, c->startingPos, c->lastLpSeg, c->lastLpSegPct);
     float pctStep = 0.05;
 
     while (pure_pursuit_distance(robot_pos, lp) < c->lookahead) {
@@ -50,7 +60,7 @@ void pure_pursuit_find_lookahead(pure_pursuit_path_point_t *lp, pure_pursuit_t *
             c->lastLpSegPct = 0;
         }
 
-        pure_pursuit_segment_point(lp, c->lastLpSeg, c->lastLpSegPct);
+        pure_pursuit_segment_point(lp, c->startingPos, c->lastLpSeg, c->lastLpSegPct);
     }
 }
 
@@ -58,7 +68,7 @@ float pure_pursuit_distance(robot_pose_t *robot_pos, pure_pursuit_path_point_t *
     return pow(pow((lp->x - robot_pos->x), 2) + pow((lp->y - robot_pos->y), 2), 0.5);
 }
 
-void pure_pursuit_segment_point(pure_pursuit_path_point_t *point, unsigned int segment, float pct){
+void pure_pursuit_segment_point(pure_pursuit_path_point_t *point, robot_pose_t *offset, unsigned int segment, float pct){
     unsigned int segi = segment % PUREPURSUIT_TRAJ_SIZE; // Loop trajectory for now
 
     pure_pursuit_path_point_t start = pure_pursuit_traj[segi];
@@ -69,4 +79,9 @@ void pure_pursuit_segment_point(pure_pursuit_path_point_t *point, unsigned int s
 
     point->x = start.x + dx * pct;
     point->y = start.y + dy * pct;
+
+    if (offset){
+        point->x += offset->x;
+        point->y += offset->y;
+    }
 }
