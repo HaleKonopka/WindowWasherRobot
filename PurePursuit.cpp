@@ -17,11 +17,19 @@ void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[0].x = 0;
     pure_pursuit_traj[0].y = 0;
     pure_pursuit_traj[1].x = 0;
-    pure_pursuit_traj[1].y = 8;
-    pure_pursuit_traj[2].x = 36;
-    pure_pursuit_traj[2].y = 8;
-    pure_pursuit_traj[3].x = 36;
-    pure_pursuit_traj[3].y = 0;
+    pure_pursuit_traj[1].y = -15;
+    pure_pursuit_traj[2].x = 5;
+    pure_pursuit_traj[2].y = 0;
+    pure_pursuit_traj[3].x = 5;
+    pure_pursuit_traj[3].y = -15;
+    pure_pursuit_traj[4].x = 10;
+    pure_pursuit_traj[4].y = 0;
+    pure_pursuit_traj[5].x = 10;
+    pure_pursuit_traj[5].y = -15;
+    pure_pursuit_traj[6].x = 15;
+    pure_pursuit_traj[6].y = 0;
+    pure_pursuit_traj[7].x = 15;
+    pure_pursuit_traj[7].y = -15;
 }
 
 void pure_pursuit_calculate(pure_pursuit_t *c, robot_cables_t *cables_pos, robot_cables_t *cables_vel){

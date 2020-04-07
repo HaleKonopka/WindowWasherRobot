@@ -59,8 +59,8 @@ void setup ()
   motor_initialize(&top_l_motor, &leftEncoder, &top_l_control, MTR_TOP_L_EN, MTR_TOP_L_ENB, MTR_TOP_L_PWM1, MTR_TOP_L_PWM2, MTR_TOP_L_DIAG, false, false);
 
   // Setup path follower
-  startingLocation.x = 7.0;
-  startingLocation.y = 39.0;
+  startingLocation.x = 16.0;
+  startingLocation.y = 62.0;
   pure_pursuit_initialize(&follower, &startingLocation, 1, 3);
   kinematics_reverse_position(&startingLocation, &cableLenInitial);
 

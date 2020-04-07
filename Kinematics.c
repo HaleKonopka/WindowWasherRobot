@@ -2,8 +2,8 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define KINE_WINDOW_WIDTH   60
-#define KINE_WINDOW_HEIGHT  72
+#define KINE_WINDOW_WIDTH   57
+#define KINE_WINDOW_HEIGHT  92
 #define KINE_ROBOT_WIDTH    7.5
 #define KINE_ROBOT_HEIGHT   7.5
 #define KINE_MAX_CABLE_LEN  (pow(pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT,2) + pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH,2), 0.5))
