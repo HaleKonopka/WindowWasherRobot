@@ -3,6 +3,7 @@
 #include "Kinematics.h"
 #include "PurePursuit.h"
 #include <Encoder.h>
+#include "YACL.h"
 
 #define KP                    .2
 #define KI                    0.2
@@ -45,6 +46,19 @@ robot_cables_t cableVels;
 
 int iter = 0;
 
+boolean sendLog(CBORPair logger)
+{
+  // Convert from CBOR Pair Object to byte array to be sent over serial
+  const uint8_t *cbor_encoded = logger.to_CBOR();
+  
+  // Send payload length (2 bites for a size_t on Arduino) followed by payload
+  // Format: [ payload len LSB | payload len MSB | payload ]
+  size_t payload_len = logger.length();     // sizeof(size_t) = 2 bytes
+  Serial.write(payload_len % 256);          // Send LSB
+  Serial.write(payload_len >> 8);           // Send MSB
+  Serial.write(cbor_encoded, payload_len);  // Send Payload
+}
+
 void setup () 
 {
   Serial.begin(115200);  // Initialize the serial port
@@ -69,6 +83,10 @@ void setup ()
 
 void loop () 
 {
+  // Create CBOR Pair Object. Add items by appending dictionary pairs
+  // 500 Bytes for logger arbitrarily chosen, may need to change this depending on usage
+  CBORPair logger = CBORPair(500); 
+  
   cableLens.top_left = motor_get_position(&top_l_motor);
   cableLens.top_right = motor_get_position(&top_r_motor);
   cableLens.top_left += cableLenInitial.top_left;
@@ -81,6 +99,28 @@ void loop ()
 
   motor_update_pid(&top_l_motor);
   motor_update_pid(&top_r_motor);
+
+  /* Some Notes about CBOR logging
+   *  - All samples within a given CBOR-formatted payload will be given the same timestamp. 
+   *    If you want to sample different quantities at different frequencies, send them as
+   *    individual payloads
+   *  - Timestamping samples is achieved by appending a "time(ms)" field 
+   *    e.g. CBORPair logger = CBORPair(500); <-- Change buffer size as needed
+   *         logger.append("time(ms)", millis())
+   *  - On the Raspberry Pi side, all data entries logged with a given timestamp
+   *    will be logged on the same row of the output CSV file.
+   *    - The flow on Raspberry Pi side is 
+   *      1) Serial CBOR-formatted message received, convert this to dictionary form
+   *      2) Load into Pandas dataframe (this stores the entire CSV in memory)
+   *      3) Periodically (every 30 seconds) replace existing csv file (definitely wasteful 
+   *         as opposed to appending, so testing will need to be performed to see if this breaks)
+   */
+  logger.append("time(ms)", millis()); // When logging, always append timestamp for samples
+  logger.append("TL vel set", top_l_motor.vel_cmd);
+  logger.append("TL vel meas", motor_get_velocity(&top_l_motor));
+  logger.append("TR vel set", top_r_motor.vel_cmd);
+  logger.append("TR vel meas", motor_get_velocity(&top_r_motor));
+  sendLog(logger);
 
   if (iter > 20){
     char p[100];
