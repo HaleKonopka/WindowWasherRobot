@@ -3,9 +3,10 @@
 
 #include "Kinematics.h"
 
-#define MASS 4.5 // no idea how heavy this thing is
-#define THETA 0.785398
-#define BASE_T 10 // arbitrary value right now
+#define MASS 4 // kg
+#define THETA 0.785398 // Angle from center to spool wrt x axis
+#define BASE_T 20 // Minimum tension in bottom motors
+#define g 9.81
 
 typedef struct {
     float T1;
