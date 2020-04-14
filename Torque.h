@@ -3,9 +3,8 @@
 
 #include "Kinematics.h"
 
-#define CEN_TO_SPOOL
 #define MASS 4.5 // no idea how heavy this thing is
-#define THETA 
+#define THETA 0.785398
 #define BASE_T 10 // arbitrary value right now
 
 typedef struct {
