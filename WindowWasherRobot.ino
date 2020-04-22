@@ -87,9 +87,9 @@ void setup ()
   // Setup orientation sensor
   kinematics_init_orientation_sensor(&ang_sen);
 
-  // Setup path follower
-  startingLocation.x = 7.0;
-  startingLocation.y = 71.0;
+  // SetSup path follower
+  startingLocation.x = 14.5;
+  startingLocation.y = 54.0;
   pure_pursuit_initialize(&follower, &startingLocation, 1, 2);
   kinematics_reverse_position(&startingLocation, &cableLenInitial);
 
@@ -100,29 +100,11 @@ void setup ()
     motor_run_coast(&bot_r_motor, 0.2);
   }
 
-  uint8_t cal_stat, a, b, c = 0;
-  while (cal_stat < 3 || a < 3 || b< 3 || c < 3){
-    ang_sen.bno.getCalibration(&cal_stat, &a, &b, &c);
-    Serial.print("Cal status: ");
-    Serial.print(cal_stat);
-    Serial.print(" ");
-    Serial.print(a);
-    Serial.print(" ");
-    Serial.print(b);
-    Serial.print(" ");
-    Serial.print(c);
-    Serial.print(" ");
-  }
-
-  Serial.print("Cal done!\n");
   adafruit_bno055_offsets_t offsets;
-  ang_sen.bno.getSensorOffsets(offsets);
-  EEPROM.put(0, offsets);
-  Serial.println(offsets.accel_offset_x);
-  Serial.println(offsets.accel_offset_y);
-  Serial.println(offsets.gyro_offset_z);
-  Serial.println(offsets.mag_offset_x );
-  Serial.print("Written!\n");
+  EEPROM.get(0, offsets);
+  Serial.print("Reading Calibration values such as mag_x: ");
+  Serial.println(offsets.mag_offset_x);
+  ang_sen.bno.setSensorOffsets(offsets);
 
   // Wait for good orientation calibration
   pinMode(LED_IND_PIN, OUTPUT);
@@ -159,17 +141,17 @@ void loop ()
 
   float pwr_adj = 0;
   if (cableVels.top_left  > 0 && cableVels.top_right > 0){
-    pwr_adj += .15;
+    pwr_adj += .22;
     Serial.print("Going down!\n");
   }
 
   float ang = kinematics_get_orientation(&ang_sen);
-  if (ang > 0.05){
-    motor_run_coast(&bot_l_motor, 0.2 + pwr_adj);
-    motor_run_coast(&bot_r_motor, 0.07 + pwr_adj);
-  } else if (ang < -0.05){
-    motor_run_coast(&bot_l_motor, 0.07 + pwr_adj);
-    motor_run_coast(&bot_r_motor, 0.2 + pwr_adj);
+  if (ang > 0.01){
+    motor_run_coast(&bot_l_motor, 0.32 + pwr_adj);
+    motor_run_coast(&bot_r_motor, 0.17 + pwr_adj);
+  } else if (ang < -0.01){
+    motor_run_coast(&bot_l_motor, 0.09 + pwr_adj);
+    motor_run_coast(&bot_r_motor, 0.42 + pwr_adj);
   } else {
     motor_run_coast(&bot_l_motor, 0.1 + pwr_adj);
     motor_run_coast(&bot_r_motor, 0.1 + pwr_adj);

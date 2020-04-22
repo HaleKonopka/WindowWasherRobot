@@ -17,18 +17,18 @@ void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[0].x = 0;
     pure_pursuit_traj[0].y = 0;
     pure_pursuit_traj[1].x = 0;
-    pure_pursuit_traj[1].y = -36;
-    pure_pursuit_traj[2].x = 10;
-    pure_pursuit_traj[2].y = -36;
-    pure_pursuit_traj[3].x = 10;
+    pure_pursuit_traj[1].y = -29;
+    pure_pursuit_traj[2].x = 8;
+    pure_pursuit_traj[2].y = -29;
+    pure_pursuit_traj[3].x = 8;
     pure_pursuit_traj[3].y = 0;
-    pure_pursuit_traj[4].x = 20;
+    pure_pursuit_traj[4].x = 16;
     pure_pursuit_traj[4].y = 0;
-    pure_pursuit_traj[5].x = 20;
-    pure_pursuit_traj[5].y = -20;
-    pure_pursuit_traj[6].x = 30;
-    pure_pursuit_traj[6].y = -20;
-    pure_pursuit_traj[7].x = 30;
+    pure_pursuit_traj[5].x = 16;
+    pure_pursuit_traj[5].y = -29;
+    pure_pursuit_traj[6].x = 24;
+    pure_pursuit_traj[6].y = -29;
+    pure_pursuit_traj[7].x = 24;
     pure_pursuit_traj[7].y = 0;
 }
 

@@ -4,8 +4,8 @@
 
 #define KINE_WINDOW_WIDTH   57
 #define KINE_WINDOW_HEIGHT  92
-#define KINE_ROBOT_WIDTH    7.5
-#define KINE_ROBOT_HEIGHT   7.5
+#define KINE_ROBOT_WIDTH    6
+#define KINE_ROBOT_HEIGHT   6
 #define KINE_MAX_CABLE_LEN  (pow(pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT,2) + pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH,2), 0.5))
 
 static const float kinematics_max_cable_len = KINE_MAX_CABLE_LEN;
@@ -85,11 +85,10 @@ void kinematics_init_orientation_sensor(robot_orientation_sensor_t *sensor){
 float kinematics_get_orientation(robot_orientation_sensor_t *sensor){
     sensors_event_t event;
     sensor->bno.getEvent(&event);
-    float angle = event.orientation.x;
+    float angle = event.orientation.y;
     //Serial.print("ANGLE: "); Serial.print(angle, 4); Serial.println();
-    angle -= 180; // 90deg is vertical on sensor
-    //if (angle > 180) angle -= 360; // Shift range to -180 <-> 180
-    return angle * 6.283 / 360 - .13; // Convert to radians
+    if (angle > 180) angle -= 360; // Shift range to -180 <-> 180
+    return angle * 6.283 / 360; // Convert to radians
 }
 
 bool kinematics_get_orientation_valid(robot_orientation_sensor_t *sensor){
