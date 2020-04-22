@@ -19,7 +19,7 @@ static const float kinematics_max_cable_len = KINE_MAX_CABLE_LEN;
  * Perform forward kinematics on supplied cable lengths to determine
  * the pose of the robot.
  */
-void kinematics_forward_position(robot_cables_t *cab, robot_pose_t *p){
+void kinematics_forward_position(robot_cables_t *cab, robot_pose_t *p, robot_orientation_sensor_t *sensor){
     float mounts_offset_x = KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH;
     float robot_offset_y = 0; //TODO: Add support for angled robot
 
@@ -41,7 +41,8 @@ void kinematics_forward_position(robot_cables_t *cab, robot_pose_t *p){
 
     p->x = x_pos;
     p->y = y_pos;
-    p->rad = 0; //TODO: Add support for angled robot
+    if (sensor && kinematics_get_orientation_valid(sensor)) p->rad = kinematics_get_orientation(sensor);
+    else p->rad = 0;
 }
 
 /**
@@ -69,4 +70,33 @@ bool kinematics_cables_valid(robot_cables_t *c){
     if (c->top_left < 0 || c->top_left > KINE_MAX_CABLE_LEN)  return false;
     if (c->top_right < 0 || c->top_right > KINE_MAX_CABLE_LEN) return false;
     return true;
+}
+
+void kinematics_init_orientation_sensor(robot_orientation_sensor_t *sensor){
+    sensor->bno = Adafruit_BNO055(55, 0x28);
+      if(!sensor->bno.begin_no_reset())
+    {
+        /* There was a problem detecting the BNO055 ... check your connections */
+        Serial.print("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+        while(1);
+    }
+}
+
+float kinematics_get_orientation(robot_orientation_sensor_t *sensor){
+    sensors_event_t event;
+    sensor->bno.getEvent(&event);
+    float angle = event.orientation.x;
+    //Serial.print("ANGLE: "); Serial.print(angle, 4); Serial.println();
+    angle -= 180; // 90deg is vertical on sensor
+    //if (angle > 180) angle -= 360; // Shift range to -180 <-> 180
+    return angle * 6.283 / 360 - .13; // Convert to radians
+}
+
+bool kinematics_get_orientation_valid(robot_orientation_sensor_t *sensor){
+    uint8_t system, gyro, accel, mag;
+    system = gyro = accel = mag = 0;
+    sensor->bno.getCalibration(&system, &gyro, &accel, &mag);
+
+    if (system > 0) return true;
+    return false;
 }

@@ -17,29 +17,29 @@ void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[0].x = 0;
     pure_pursuit_traj[0].y = 0;
     pure_pursuit_traj[1].x = 0;
-    pure_pursuit_traj[1].y = -15;
-    pure_pursuit_traj[2].x = 5;
-    pure_pursuit_traj[2].y = 0;
-    pure_pursuit_traj[3].x = 5;
-    pure_pursuit_traj[3].y = -15;
-    pure_pursuit_traj[4].x = 10;
+    pure_pursuit_traj[1].y = -36;
+    pure_pursuit_traj[2].x = 10;
+    pure_pursuit_traj[2].y = -36;
+    pure_pursuit_traj[3].x = 10;
+    pure_pursuit_traj[3].y = 0;
+    pure_pursuit_traj[4].x = 20;
     pure_pursuit_traj[4].y = 0;
-    pure_pursuit_traj[5].x = 10;
-    pure_pursuit_traj[5].y = -15;
-    pure_pursuit_traj[6].x = 15;
-    pure_pursuit_traj[6].y = 0;
-    pure_pursuit_traj[7].x = 15;
-    pure_pursuit_traj[7].y = -15;
+    pure_pursuit_traj[5].x = 20;
+    pure_pursuit_traj[5].y = -20;
+    pure_pursuit_traj[6].x = 30;
+    pure_pursuit_traj[6].y = -20;
+    pure_pursuit_traj[7].x = 30;
+    pure_pursuit_traj[7].y = 0;
 }
 
-void pure_pursuit_calculate(pure_pursuit_t *c, robot_cables_t *cables_pos, robot_cables_t *cables_vel){
+void pure_pursuit_calculate(pure_pursuit_t *c, robot_cables_t *cables_pos, robot_cables_t *cables_vel, robot_orientation_sensor_t *sensor){
     robot_pose_t robot_pos;
     char p[100];
     sprintf(p, "Cable pose: (%s, %s)", String(cables_pos->top_left, 2).c_str(), String(cables_pos->top_right, 2).c_str());
-    Serial.println(p);
-    kinematics_forward_position(cables_pos, &robot_pos);
+    //Serial.println(p);
+    kinematics_forward_position(cables_pos, &robot_pos, sensor);
 
-    sprintf(p, "Robot pose: (%s, %s)", String(robot_pos.x, 2).c_str(), String(robot_pos.y, 2).c_str());
+    sprintf(p, "Robot pose: (%s, %s, %s)", String(robot_pos.x, 2).c_str(), String(robot_pos.y, 2).c_str(), String(robot_pos.rad, 3).c_str());
     Serial.println(p);
 
     pure_pursuit_path_point_t lp;

@@ -14,6 +14,7 @@ typedef struct {
     uint8_t pwm_a;
     uint8_t pwm_b;
     uint8_t diag;
+    uint8_t cs;
     unsigned long lastTimeMillis;
     long lastCount;
     Encoder *enc;
@@ -27,11 +28,13 @@ typedef struct {
 } motor_t;
 
 void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_pin, 
-    uint8_t enb_pin, uint8_t pwm_a_pin, uint8_t pwm_b_pin, uint8_t diag_pin, bool rev_enc, bool rev_motor);
+    uint8_t enb_pin, uint8_t pwm_a_pin, uint8_t pwm_b_pin, uint8_t diag_pin, uint8_t cs_pin, bool rev_enc, bool rev_motor);
+float motor_get_current(motor_t *m);
 bool motor_has_error(motor_t *m);
 void motor_stop(motor_t *m, bool brake);
 void motor_coast(motor_t *m);
 void motor_run(motor_t *m, float pct);
+void motor_run_coast(motor_t *m, float pct);
 void motor_set_velocity(motor_t *m, float vel);
 float motor_get_velocity(motor_t *m);
 float motor_get_position(motor_t *m);

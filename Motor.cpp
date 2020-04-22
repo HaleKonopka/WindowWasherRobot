@@ -4,12 +4,13 @@
  * Initialize a new motor
  */
 void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_pin, uint8_t enb_pin,
-    uint8_t pwm_a_pin, uint8_t pwm_b_pin, uint8_t diag_pin, bool rev_enc, bool rev_motor){
+    uint8_t pwm_a_pin, uint8_t pwm_b_pin, uint8_t diag_pin, uint8_t cs_pin, bool rev_enc, bool rev_motor){
     m->en = en_pin;
     m->enb = enb_pin;
     m->pwm_a = pwm_a_pin;
     m->pwm_b = pwm_b_pin;
     m->diag = diag_pin;
+    m->cs = cs_pin;
     m->enc = enc;
     m->lastCount = 0;
     m->lastTimeMillis = millis();
@@ -18,12 +19,11 @@ void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_p
     m->rev_motor = rev_motor;
 
     pinMode(m->en,  OUTPUT);
-    digitalWrite(m->en, HIGH);
     pinMode(m->enb, OUTPUT);
-    digitalWrite(m->enb, LOW);
-    pinMode(m->diag, INPUT);
+    pinMode(m->diag, INPUT_PULLUP);
     pinMode(m->pwm_a, OUTPUT);
     pinMode(m->pwm_b, OUTPUT);
+    pinMode(m->cs, INPUT);
 
     motor_stop(m, true);
 
@@ -32,7 +32,13 @@ void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_p
         m->vel_avg[i] = 0;
     }
 
-    m->enc->write(0);
+    if (m->enc) m->enc->write(0);
+}
+
+float motor_get_current(motor_t *m){
+    int adc_val = analogRead(m->cs);
+    float current = ((float) adc_val) * 5.0 / 1024.0 / 0.5;
+    return current;
 }
 
 /**
@@ -143,6 +149,41 @@ void motor_run(motor_t *m, float pct){
         analogWrite(m->pwm_a, pwm);
         analogWrite(m->pwm_b, LOW);
     } else {
+        analogWrite(m->pwm_a, LOW);
+        analogWrite(m->pwm_b, LOW);
+    }
+}
+
+/** 
+ * Run the motor at a specified percentage power
+ * 
+ * @param pct Value from -1 to +1, where -1 is full power
+ *            reverse and +1 is full power forward
+ */
+void motor_run_coast(motor_t *m, float pct){
+    pct *= (m->rev_motor ? -1 : 1);
+
+    float value = pct * 255.0;
+    if (value > 255.0) value = 255.0;
+    if (value < -255.0) value = -255.0;
+    
+    digitalWrite(m->enb, LOW);
+
+    if (value > 0) {
+        int pwm = value;
+        pwm = pwm & 0xFF;
+        analogWrite(m->en, pwm);
+        digitalWrite(m->pwm_b, HIGH);
+        digitalWrite(m->pwm_a, LOW);
+    } else if (value < 0){
+        value *= -1;
+        int pwm = value;
+        pwm = pwm & 0xFF;
+        analogWrite(m->en, pwm);
+        digitalWrite(m->pwm_b, LOW);
+        digitalWrite(m->pwm_a, HIGH);
+    } else {
+        analogWrite(m->en, LOW);
         analogWrite(m->pwm_a, LOW);
         analogWrite(m->pwm_b, LOW);
     }
