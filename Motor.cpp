@@ -17,6 +17,7 @@ void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_p
     m->pid = pid;
     m->rev_enc = rev_enc;
     m->rev_motor = rev_motor;
+    m->max_pwr = 1.0;
 
     pinMode(m->en,  OUTPUT);
     pinMode(m->enb, OUTPUT);
@@ -130,6 +131,12 @@ void motor_coast(motor_t *m){
 void motor_run(motor_t *m, float pct){
     pct *= (m->rev_motor ? -1 : 1);
 
+    if (pct > m->max_pwr){
+        pct = m->max_pwr;
+    } else if (pct < -m->max_pwr){
+        pct = -m->max_pwr;
+    }
+
     float value = pct * 255.0;
     if (value > 255.0) value = 255.0;
     if (value < -255.0) value = -255.0;
@@ -162,6 +169,12 @@ void motor_run(motor_t *m, float pct){
  */
 void motor_run_coast(motor_t *m, float pct){
     pct *= (m->rev_motor ? -1 : 1);
+
+    if (pct > m->max_pwr){
+        pct = m->max_pwr;
+    } else if (pct < -m->max_pwr){
+        pct = -m->max_pwr;
+    }
 
     float value = pct * 255.0;
     if (value > 255.0) value = 255.0;

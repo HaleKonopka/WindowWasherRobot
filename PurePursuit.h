@@ -4,7 +4,7 @@
 #include "Kinematics.h"
 #include <Encoder.h>
 
-#define PUREPURSUIT_TRAJ_SIZE   8
+#define PUREPURSUIT_TRAJ_SIZE   16
 
 typedef struct {
     float x;

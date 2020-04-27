@@ -83,6 +83,8 @@ void setup ()
   motor_initialize(&top_l_motor, &leftEncoder, &top_l_control, MTR_TOP_L_EN, MTR_TOP_L_ENB, MTR_TOP_L_PWM1, MTR_TOP_L_PWM2, MTR_TOP_L_DIAG, MTR_TOP_L_CS, false, false);
   motor_initialize(&bot_r_motor, NULL, NULL, MTR_BOT_R_EN, MTR_BOT_R_ENB, MTR_BOT_R_PWM1, MTR_BOT_R_PWM2, MTR_BOT_R_DIAG, MTR_BOT_R_CS, false, true);
   motor_initialize(&bot_l_motor, NULL, NULL, MTR_BOT_L_EN, MTR_BOT_L_ENB, MTR_BOT_L_PWM1, MTR_BOT_L_PWM2, MTR_BOT_L_DIAG, MTR_BOT_L_CS, false, false);
+  top_l_motor.max_pwr = 0.8;
+  bot_l_motor.max_pwr = 0.8;
 
   // Setup orientation sensor
   kinematics_init_orientation_sensor(&ang_sen);
@@ -147,11 +149,11 @@ void loop ()
 
   float ang = kinematics_get_orientation(&ang_sen);
   if (ang > 0.01){
-    motor_run_coast(&bot_l_motor, 0.32 + pwr_adj);
-    motor_run_coast(&bot_r_motor, 0.17 + pwr_adj);
+    motor_run_coast(&bot_l_motor, 0.2 + pwr_adj);
+    motor_run_coast(&bot_r_motor, 0.0 + pwr_adj);
   } else if (ang < -0.01){
-    motor_run_coast(&bot_l_motor, 0.09 + pwr_adj);
-    motor_run_coast(&bot_r_motor, 0.42 + pwr_adj);
+    motor_run_coast(&bot_l_motor, 0.0 + pwr_adj);
+    motor_run_coast(&bot_r_motor, 0.2 + pwr_adj);
   } else {
     motor_run_coast(&bot_l_motor, 0.1 + pwr_adj);
     motor_run_coast(&bot_r_motor, 0.1 + pwr_adj);

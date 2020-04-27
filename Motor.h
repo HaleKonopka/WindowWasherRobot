@@ -25,6 +25,7 @@ typedef struct {
     pid_control_t *pid;
     bool rev_enc;
     bool rev_motor;
+    float max_pwr;
 } motor_t;
 
 void motor_initialize(motor_t *m, Encoder *enc, pid_control_t *pid, uint8_t en_pin, 
