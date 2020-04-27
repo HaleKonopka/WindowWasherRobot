@@ -3,7 +3,11 @@
 #include "Kinematics.h"
 #include "PurePursuit.h"
 #include <Encoder.h>
+<<<<<<< HEAD
 #include <EEPROM.h>
+=======
+#include "YACL.h"
+>>>>>>> 3c7004c6c6091c4f35cc061014284e93eb25dba8
 
 #define KP                    .2
 #define KI                    0.7
@@ -68,6 +72,19 @@ robot_cables_t cableVels;
 robot_orientation_sensor_t ang_sen;
 
 int iter = 0;
+
+boolean sendLog(CBORPair logger)
+{
+  // Convert from CBOR Pair Object to byte array to be sent over serial
+  const uint8_t *cbor_encoded = logger.to_CBOR();
+  
+  // Send payload length (2 bites for a size_t on Arduino) followed by payload
+  // Format: [ payload len LSB | payload len MSB | payload ]
+  size_t payload_len = logger.length();     // sizeof(size_t) = 2 bytes
+  Serial.write(payload_len % 256);          // Send LSB
+  Serial.write(payload_len >> 8);           // Send MSB
+  Serial.write(cbor_encoded, payload_len);  // Send Payload
+}
 
 void setup () 
 {
