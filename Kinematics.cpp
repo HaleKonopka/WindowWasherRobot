@@ -108,3 +108,8 @@ bool kinematics_get_orientation_valid(robot_orientation_sensor_t *sensor){
     if (system > 0) return true;
     return false;
 }
+
+void torque_calc(robot_torque_t *t, robot_pose_t *p){
+	t->V1 = 1.015 + 0.007952*(p->x) - 0.002511*(p->y) - 0.001724*pow(p->x, 2) + 0.0001361*(p->x)*(p->y) + 2.305e-5*pow(p->x, 3) + -7.105e-7*pow(p->x, 2)*(p->y);
+	t->V2 = 1-t->V1;
+}
