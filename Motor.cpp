@@ -99,6 +99,12 @@ float motor_get_position(motor_t *m){
     return motor_read_encoder(m) * DIST_PER_REV / ENCODER_TICKS_PER_REV;
 }
 
+void motor_set_torque(motor_t *m, float N, float speed){
+    float angvel = speed / DIST_PER_REV; // angvel in rev/sec
+    float v = (N * SPOOL_RAD / 9.8 * MOTOR_RES) / MOTOR_KT + MOTOR_KREVS * angvel;
+    motor_run_coast(m, v / 24.0);
+}
+
 /**
  * Determine if the motor driver is in error
  */

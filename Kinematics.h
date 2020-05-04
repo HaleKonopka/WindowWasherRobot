@@ -13,6 +13,8 @@ typedef struct {
 typedef struct {
     float top_right;
     float top_left;
+    float bot_right;
+    float bot_left;
 } robot_cables_t;
 
 typedef struct {

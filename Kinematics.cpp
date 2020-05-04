@@ -52,12 +52,21 @@ void kinematics_forward_position(robot_cables_t *cab, robot_pose_t *p, robot_ori
 void kinematics_reverse_position(robot_pose_t *p, robot_cables_t *c){
     c->top_left = pow(pow(p->x, 2) + pow(p->y, 2), 0.5);
     c->top_right = pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - p->x, 2) + pow(p->y, 2), 0.5);
+    c->bot_left = pow(pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - p->y, 2) + pow(p->x, 2), 0.5);
+    c->bot_right = pow(pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - p->x, 2), 2) +
+        pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - p->y, 2), 0.5);
 }
 
 void kinematics_reverse_velocity(robot_pose_t *pos, robot_pose_t *vel, robot_cables_t *c){
     c->top_left = pow(pow(pos->x, 2) + pow(pos->y, 2), -0.5) * (vel->x*pos->x + vel->y*pos->y);
     c->top_right = pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2) + pow(pos->y, 2), -0.5) * 
         (vel->y*pos->y - (KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x)*vel->x);
+    c->bot_left = pow(pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y, 2) + pow(pos->x, 2), -0.5) *
+        (-vel->y*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) + vel->x*pos->x);
+    c->bot_right = pow(pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2), 2) +
+        pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y, 2), -0.5) *
+        (-vel->y*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) -
+        vel->x*(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x))
 }
 
 bool kinematics_pose_valid(robot_pose_t *p){

@@ -18,10 +18,10 @@ void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[0].y = 0;
     
     pure_pursuit_traj[1].x = 0;
-    pure_pursuit_traj[1].y = -29;
+    pure_pursuit_traj[1].y = -40;
     
     pure_pursuit_traj[2].x = 3.5;
-    pure_pursuit_traj[2].y = -29;
+    pure_pursuit_traj[2].y = -40;
     
     pure_pursuit_traj[3].x = 3.5;
     pure_pursuit_traj[3].y = 0;
@@ -30,10 +30,10 @@ void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[4].y = 0;
     
     pure_pursuit_traj[5].x = 7;
-    pure_pursuit_traj[5].y = -29;
+    pure_pursuit_traj[5].y = -40;
     
     pure_pursuit_traj[6].x = 10.5;
-    pure_pursuit_traj[6].y = -29;
+    pure_pursuit_traj[6].y = -40;
     
     pure_pursuit_traj[7].x = 10.5;
     pure_pursuit_traj[7].y = 0;
@@ -42,10 +42,10 @@ void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[8].y = 0;
     
     pure_pursuit_traj[9].x = 14;
-    pure_pursuit_traj[9].y = -29;
+    pure_pursuit_traj[9].y = -40;
     
     pure_pursuit_traj[10].x = 17.5;
-    pure_pursuit_traj[10].y = -29;
+    pure_pursuit_traj[10].y = -40;
     
     pure_pursuit_traj[11].x = 17.5;
     pure_pursuit_traj[11].y = 0;
@@ -54,12 +54,12 @@ void pure_pursuit_init_trajectory(){
     pure_pursuit_traj[12].y = 0;
     
     pure_pursuit_traj[13].x = 20;
-    pure_pursuit_traj[13].y = -29;
+    pure_pursuit_traj[13].y = -40;
     
-    pure_pursuit_traj[14].x = 24;
-    pure_pursuit_traj[14].y = -29;
+    pure_pursuit_traj[14].x = 24.5;
+    pure_pursuit_traj[14].y = -40;
     
-    pure_pursuit_traj[15].x = 24;
+    pure_pursuit_traj[15].x = 24.5;
     pure_pursuit_traj[15].y = 0;
 }
 

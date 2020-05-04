@@ -6,7 +6,14 @@
 
 #define ENCODER_TICKS_PER_REV   (64 * 50) // 64 ticks per rev plus reduction
 #define DIST_PER_REV            3.14    // 1 inch diameter spool
+#define SPOOL_RAD               0.0127  // spool radius in meters
 #define MOTOR_SIZE_AVG_VEL      16
+
+// Motor params include 50:1 gearbox
+#define MOTOR_KT                0.07419
+#define MOTOR_KREVS             7.2
+#define MOTOR_RES               7.742
+
 
 typedef struct {
     uint8_t enb;
