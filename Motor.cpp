@@ -100,9 +100,10 @@ float motor_get_position(motor_t *m){
 }
 
 void motor_set_torque(motor_t *m, float N, float speed){
-    float angvel = speed / DIST_PER_REV; // angvel in rev/sec
+    float angvel = -speed / DIST_PER_REV + MOTOR_VBIAS; // angvel in rev/sec
     float v = (N * SPOOL_RAD / 9.8 * MOTOR_RES) / MOTOR_KT + MOTOR_KREVS * angvel;
-    motor_run_coast(m, v / 24.0);
+    Serial.println(angvel);
+    motor_run(m, v / 24.0);
 }
 
 /**

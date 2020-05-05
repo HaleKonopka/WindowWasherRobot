@@ -2,14 +2,6 @@
 #include <math.h>
 #include <stdbool.h>
 
-#define KINE_WINDOW_WIDTH   57
-#define KINE_WINDOW_HEIGHT  92
-#define KINE_ROBOT_WIDTH    6
-#define KINE_ROBOT_HEIGHT   6
-#define KINE_MAX_CABLE_LEN  (pow(pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT,2) + pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH,2), 0.5))
-
-static const float kinematics_max_cable_len = KINE_MAX_CABLE_LEN;
-
 /*
  * The origin for the window is the upper-left corner, as it also
  * is for the robot. X axis is positive-right and Y axis is positive-down.
@@ -61,12 +53,14 @@ void kinematics_reverse_velocity(robot_pose_t *pos, robot_pose_t *vel, robot_cab
     c->top_left = pow(pow(pos->x, 2) + pow(pos->y, 2), -0.5) * (vel->x*pos->x + vel->y*pos->y);
     c->top_right = pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2) + pow(pos->y, 2), -0.5) * 
         (vel->y*pos->y - (KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x)*vel->x);
+
+    float yv = vel->y + 0;
     c->bot_left = pow(pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y, 2) + pow(pos->x, 2), -0.5) *
-        (-vel->y*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) + vel->x*pos->x);
-    c->bot_right = pow(pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2), 2) +
+        (-yv*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) + vel->x*pos->x);
+    c->bot_right = pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2) +
         pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y, 2), -0.5) *
-        (-vel->y*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) -
-        vel->x*(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x))
+        (-yv*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) -
+        vel->x*(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x));
 }
 
 bool kinematics_pose_valid(robot_pose_t *p){

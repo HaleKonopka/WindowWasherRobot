@@ -67,6 +67,8 @@ robot_cables_t cableVels;
 
 robot_orientation_sensor_t ang_sen;
 
+pid_control_t ang_control;
+
 int iter = 0;
 
 void setup () 
@@ -89,16 +91,18 @@ void setup ()
   // Setup orientation sensor
   kinematics_init_orientation_sensor(&ang_sen);
 
+  pid_control_contruct(&ang_control, 150, 50, 0, 0);
+
   // SetSup path follower
   startingLocation.x = 13.5;
   startingLocation.y = 63.5;
-  pure_pursuit_initialize(&follower, &startingLocation, 1, 2);
+  pure_pursuit_initialize(&follower, &startingLocation, 1, 4);
   kinematics_reverse_position(&startingLocation, &cableLenInitial);
 
   // Init Alt-mode pin
   pinMode(ALT_MODE_PIN, INPUT_PULLUP);
   while(!digitalRead(ALT_MODE_PIN)){
-    motor_run_coast(&bot_l_motor, -0.2);
+    motor_run_coast(&bot_l_motor, 0.2);
     motor_run_coast(&bot_r_motor, 0.2);
   }
 
@@ -141,23 +145,32 @@ void loop ()
   motor_update_pid(&top_l_motor);
   motor_update_pid(&top_r_motor);
 
-  float pwr_adj = 0;
-  if (cableVels.top_left  > 0 && cableVels.top_right > 0){
-    pwr_adj += .22;
-    Serial.print("Going down!\n");
-  }
+  // float ang = kinematics_get_orientation(&ang_sen);
+  // if (ang > 0.01){
+  //   Serial.print("Left set to: ");
+  //   motor_set_torque(&bot_l_motor, 65, cableVels.bot_left);
+  //   Serial.print("Right set to: ");
+  //   motor_set_torque(&bot_r_motor, 30, cableVels.bot_right);
+  // } else if (ang < -0.01){
+  //   Serial.print("Left set to: ");
+  //   motor_set_torque(&bot_l_motor, 30, cableVels.bot_left);
+  //   Serial.print("Right set to: ");
+  //   motor_set_torque(&bot_r_motor, 65, cableVels.bot_right);
+  // } else {
+  //   Serial.print("Left set to: ");
+  //   motor_set_torque(&bot_l_motor, 40, cableVels.bot_left);
+  //   Serial.print("Right set to: ");
+  //   motor_set_torque(&bot_r_motor, 40, cableVels.bot_right);
+  // }
 
   float ang = kinematics_get_orientation(&ang_sen);
-  if (ang > 0.01){
-    motor_run_coast(&bot_l_motor, 0.2 + pwr_adj);
-    motor_run_coast(&bot_r_motor, 0.0 + pwr_adj);
-  } else if (ang < -0.01){
-    motor_run_coast(&bot_l_motor, 0.0 + pwr_adj);
-    motor_run_coast(&bot_r_motor, 0.2 + pwr_adj);
-  } else {
-    motor_run_coast(&bot_l_motor, 0.1 + pwr_adj);
-    motor_run_coast(&bot_r_motor, 0.1 + pwr_adj);
-  }
+  float bias = pid_control_calculate(&ang_control, 0, ang, millis());
+  float lv = 10 - bias < 5 ? 5 : 10 - bias;
+  float rv = 10 + bias < 5 ? 5 : 10 + bias;
+  Serial.print("Left set to: ");
+  motor_set_torque(&bot_l_motor, lv, cableVels.bot_left);
+  Serial.print("Right set to: ");
+  motor_set_torque(&bot_r_motor, rv, cableVels.bot_right);
 
   if (iter > 1){
     char p[100];

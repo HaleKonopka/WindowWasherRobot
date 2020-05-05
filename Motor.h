@@ -10,9 +10,10 @@
 #define MOTOR_SIZE_AVG_VEL      16
 
 // Motor params include 50:1 gearbox
-#define MOTOR_KT                0.07419
-#define MOTOR_KREVS             7.2
+#define MOTOR_KT                0.07419 // 0.07419
+#define MOTOR_KREVS             7.6 // 7.2
 #define MOTOR_RES               7.742
+#define MOTOR_VBIAS             0
 
 
 typedef struct {
@@ -47,5 +48,6 @@ void motor_set_velocity(motor_t *m, float vel);
 float motor_get_velocity(motor_t *m);
 float motor_get_position(motor_t *m);
 void motor_update_pid(motor_t *m);
+void motor_set_torque(motor_t *m, float N, float speed);
 
 #endif
