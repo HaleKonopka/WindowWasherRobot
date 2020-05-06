@@ -4,6 +4,7 @@
 #include "PurePursuit.h"
 #include <Encoder.h>
 #include <EEPROM.h>
+#include <Servo.h>
 
 #define KP                    .2
 #define KI                    0.7
@@ -69,12 +70,16 @@ robot_orientation_sensor_t ang_sen;
 
 pid_control_t ang_control;
 
+Servo spray;
+
 int iter = 0;
 
 void setup () 
 {
   Serial.begin(115200);  // Initialize the serial port
   Serial.println("Setup start");
+
+  spray.attach(41);
 
   // Setup velocity controllers
   pid_control_contruct(&top_r_control, KP, KI, KD, KF);
@@ -105,6 +110,13 @@ void setup ()
     motor_run_coast(&bot_l_motor, 0.2);
     motor_run_coast(&bot_r_motor, 0.2);
   }
+
+  /*while (true){
+    if (millis() % 10000 > 500)
+      spray.write(90);
+    else
+      spray.write(180);
+  }*/
 
   adafruit_bno055_offsets_t offsets;
   EEPROM.get(0, offsets);
@@ -165,8 +177,8 @@ void loop ()
 
   float ang = kinematics_get_orientation(&ang_sen);
   float bias = pid_control_calculate(&ang_control, 0, ang, millis());
-  float lv = 10 - bias < 5 ? 5 : 10 - bias;
-  float rv = 10 + bias < 5 ? 5 : 10 + bias;
+  float lv = 15 - bias < 5 ? 5 : 15 - bias;
+  float rv = 15 + bias < 5 ? 5 : 15 + bias;
   Serial.print("Left set to: ");
   motor_set_torque(&bot_l_motor, lv, cableVels.bot_left);
   Serial.print("Right set to: ");
