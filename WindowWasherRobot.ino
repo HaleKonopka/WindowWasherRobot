@@ -101,7 +101,7 @@ void setup ()
   // SetSup path follower
   startingLocation.x = 13.5;
   startingLocation.y = 63.5;
-  pure_pursuit_initialize(&follower, &startingLocation, 1, 4);
+  pure_pursuit_initialize(&follower, &startingLocation, 1.5, 5.5);
   kinematics_reverse_position(&startingLocation, &cableLenInitial);
 
   // Init Alt-mode pin

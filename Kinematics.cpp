@@ -54,12 +54,18 @@ void kinematics_reverse_velocity(robot_pose_t *pos, robot_pose_t *vel, robot_cab
     c->top_right = pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2) + pow(pos->y, 2), -0.5) * 
         (vel->y*pos->y - (KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x)*vel->x);
 
-    float yv = vel->y + 0;
+    if (vel->y > 0){
+        vel->y = (vel->y - 4) * 0.7 + 4;
+    }
+    else{
+        vel->y = (vel->y + 4) * 0.7 - 4;
+    }
+
     c->bot_left = pow(pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y, 2) + pow(pos->x, 2), -0.5) *
-        (-yv*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) + vel->x*pos->x);
+        (-vel->y*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) + vel->x*pos->x);
     c->bot_right = pow(pow(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x, 2) +
         pow(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y, 2), -0.5) *
-        (-yv*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) -
+        (-vel->y*(KINE_WINDOW_HEIGHT - KINE_ROBOT_HEIGHT - pos->y) -
         vel->x*(KINE_WINDOW_WIDTH - KINE_ROBOT_WIDTH - pos->x));
 }
 
