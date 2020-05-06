@@ -101,7 +101,7 @@ void setup ()
   // SetSup path follower
   startingLocation.x = 13.5;
   startingLocation.y = 63.5;
-  pure_pursuit_initialize(&follower, &startingLocation, 1.5, 5.5);
+  pure_pursuit_initialize(&follower, &startingLocation, 1.5, 4);
   kinematics_reverse_position(&startingLocation, &cableLenInitial);
 
   // Init Alt-mode pin
@@ -115,7 +115,7 @@ void setup ()
     if (millis() % 10000 > 500)
       spray.write(90);
     else
-      spray.write(180);
+      spray.write(1g80);
   }*/
 
   adafruit_bno055_offsets_t offsets;
